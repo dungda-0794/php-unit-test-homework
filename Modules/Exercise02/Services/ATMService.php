@@ -14,7 +14,7 @@ class ATMService
     const TIME_PERIOD_1 = ['00:00', '8:44'];
     const TIME_PERIOD_2 = ['08:45', '17:59'];
     const TIME_PERIOD_3 = ['18:00', '23:59'];
-    const HOLIDAYS = ['01-01', '30-04', '01-05'];
+    const HOLIDAYS = ['01-01', '30-04', '01-05', '02-05'];
 
     /**
      * @var ATMRepository

@@ -3,9 +3,6 @@
 namespace Modules\Exercise02\Services;
 
 use Carbon\Carbon;
-use Modules\Exercise02\Models\ATM;
-use InvalidArgumentException;
-use Modules\Exercise02\Repositories\ATMRepository;
 
 class ATMService
 {
@@ -16,18 +13,32 @@ class ATMService
     const TIME_PERIOD_3 = ['18:00', '23:59'];
     const HOLIDAYS = ['01-01', '30-04', '01-05'];
 
-    /**
-     * @var ATMRepository
-     */
-    protected $atmRepository;
 
-    /**
-     * ProductService constructor.
-     * @param ATMRepository $ATMRepository
+     /**
+     * Calcuate ATM Fee for vip customer
+     *
+     *
+     * @return null
      */
-    public function __construct(ATMRepository $atmRepository)
+    public function calculateFeeForVipCustomer()
     {
-        $this->atmRepository = $atmRepository;
+        if ($isVip) {
+            return self::NO_FEE;
+        }
+
+        // Return normalFee if it is holiday or weekend
+        $transactionDate = Carbon::parse($transactionAt);
+        if (in_array($transactionDate->format('d-m'), self::HOLIDAYS) || $transactionDate->isWeekend()) {
+            return self::NORMAL_FEE;
+        }
+
+        $timeNow = $transactionDate->format('H:i');
+        list($minTimePeriod2, $maxTimePeriod2) = self::TIME_PERIOD_2;
+        if ($timeNow >= $minTimePeriod2 && $timeNow <= $maxTimePeriod2) {
+            return self::NO_FEE;
+        }
+
+        return self::NORMAL_FEE;
     }
 
     /**
@@ -36,25 +47,19 @@ class ATMService
      *
      * @return null
      */
-    public function calculate($cardId)
+    public function calculateFee($isVip, $transactionAt)
     {
-        $card = $this->atmRepository->find($cardId);
-
-        if (!$card) {
-            throw new InvalidArgumentException('Card ID is invalid!');
-        }
-
-        if ($card->is_vip) {
+        if ($isVip) {
             return self::NO_FEE;
         }
 
-        // Nếu là ngày lễ trả về normalFee
-        $today = Carbon::now();
-        if (in_array($today->format('d-m'), self::HOLIDAYS) || $today->isWeekend()) {
+        // Return normalFee if it is holiday or weekend
+        $transactionDate = Carbon::parse($transactionAt);
+        if (in_array($transactionDate->format('d-m'), self::HOLIDAYS) || $transactionDate->isWeekend()) {
             return self::NORMAL_FEE;
         }
 
-        $timeNow = $today->format('H:i');
+        $timeNow = $transactionDate->format('H:i');
         list($minTimePeriod2, $maxTimePeriod2) = self::TIME_PERIOD_2;
         if ($timeNow >= $minTimePeriod2 && $timeNow <= $maxTimePeriod2) {
             return self::NO_FEE;

@@ -4,7 +4,6 @@ namespace Modules\Exercise03\Services;
 
 use InvalidArgumentException;
 use Modules\Exercise03\Models\Product;
-use Modules\Exercise03\Repositories\ProductRepository;
 
 /**
  * Class ProductService
@@ -17,54 +16,28 @@ class ProductService
     const TOTAL_PRODUCT_TO_DISCOUNT = 7;
 
     /**
-     * @var ProductRepository
-     */
-    protected $productRepository;
-
-    /**
-     * ProductService constructor.
-     * @param ProductRepository $productRepository
-     */
-    public function __construct(ProductRepository $productRepository)
-    {
-        $this->productRepository = $productRepository;
-    }
-
-    /**
      * Calculate discount by products
      *
      * @param $totalProducts
      * @return mixed
      */
-    public function calculateDiscount($totalProducts)
+    public function calculateDiscount($products)
     {
-        $cravat = $totalProducts[Product::CRAVAT_TYPE] ?? 0;
-        $whiteShirt = $totalProducts[Product::WHITE_SHIRT_TYPE] ?? 0;
-        $others = $totalProducts[Product::OTHER_TYPE] ?? 0;
+        $cravats = isset($products[Product::CRAVAT_TYPE]) ? $products[Product::CRAVAT_TYPE] : [];
+        $whiteShirts = isset($products[Product::WHITE_SHIRT_TYPE]) ? $products[Product::WHITE_SHIRT_TYPE] : [];
+        $others = isset($products[Product::OTHER_TYPE]) ? $products[Product::OTHER_TYPE] : [];
         $discount = 0;
 
-        if ($cravat < 0 || $whiteShirt < 0 || $others < 0) {
-            throw new InvalidArgumentException();
+        $totalProducts = count($cravats) + count($whiteShirts) + count($others);
+
+        if ($totalProducts >= 7) {
+            $discount = self::TOTAL_PRODUCT_TO_DISCOUNT;
         }
 
-        if ($cravat > 0 && $whiteShirt > 0) {
-            $discount = self::CRAVAT_WHITE_SHIRT_DISCOUNT;
-        }
-
-        if (($cravat + $whiteShirt + $others) >= self::TOTAL_PRODUCT_TO_DISCOUNT) {
-            $discount += self::QUANTITY_DISCOUNT;
+        if (count($whiteShirts) > 0 && count($cravats) > 0) {
+            $discount += self::CRAVAT_WHITE_SHIRT_DISCOUNT;
         }
 
         return $discount;
-    }
-
-    /**
-     * Get all of products
-     *
-     * @return \Illuminate\Database\Eloquent\Collection|Product[]
-     */
-    public function getAllProducts()
-    {
-        return $this->productRepository->all();
     }
 }

@@ -36,7 +36,7 @@ class TicketService
         }
 
         if ($dayOfWeek == 3) {
-            return  self::PRICE_IN_TUESDAY;
+            return self::PRICE_IN_TUESDAY;
         }
 
         if ($input['gender'] == config('exercise08.gender.female') && $dayOfWeek == 6) {

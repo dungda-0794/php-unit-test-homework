@@ -43,7 +43,7 @@ class ProductService
         $others = $totalProducts[Product::OTHER_TYPE] ?? 0;
         $discount = 0;
 
-        if ($cravat < 0 || $whiteShirt < 0 || $others < 0) {
+        if ($cravat <= 0 && $whiteShirt <= 0 && $others <= 0) {
             throw new InvalidArgumentException();
         }
 
